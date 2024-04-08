@@ -1,0 +1,7 @@
+.PHONY: build
+build: 
+	 cargo build --release
+
+.PHONY: test
+test: build
+	 ./target/release/swan_aleo_check_aleo_proof -n 122 -l 1 -a aleo1n6utz6c8gtgqp4xfkm03ckf4n9fupuv3jf0feea9ggt547skasxq423ajy --proof "task_id:10001,nonce:8837783779460058597,challenge:f1140000cd0816c483694645784e4024bdb528620b73ef5b6658a5ee004dfd9319985404ff1f0000,solution:puzzle1y2xn62m6ahr3kyqdsnv043xlt8993hdwse87ak9zthgq6rmecnrdh2qfdz36527ur8vz3m9xdahcqxmcq5q,proof:7e4bd4882b45a5e0407ad732aeab9072865b52853005c94b8e0e098f10c07087c8ac5d5514ed13ded7f689ca5f67310000,target:602"

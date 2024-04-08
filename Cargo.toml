@@ -3,4 +3,12 @@ name = "swan_aleo_check_aleo_proof"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies.snarkvm]
+git = "https://github.com/AleoHQ/snarkVM.git"
+rev = "f761d1e"
+#version = "=0.16.18"
+features = [ "circuit", "console", "rocks" ]
+
 [dependencies]
+structopt = "0.3.26"
+hex = "0.4.3"
