@@ -1,10 +1,23 @@
+VERSION=0.0.1
+NAME=swan-check-aleo-proof
+REPO=martian123
+
 .PHONY: build
 build: 
-	 cargo build --release
+	cargo build --release && \
+	cp ./target/release/swan_aleo_check_aleo_proof ./swan-check-aleo-proof
 
 .PHONY: run
 run: build
-	 ./target/release/swan_aleo_check_aleo_proof -p 3031
+	 ./swan-check-aleo-proof -p 3031
+
+.PHONY: docker
+docker: build
+	@sudo docker build -t $(REPO)/$(NAME):$(VERSION) . 
+
+.PHONY: push
+push: docker
+	@sudo docker push $(REPO)/$(NAME):$(VERSION)
 
 .PHONY: test_T
 test_T: 
