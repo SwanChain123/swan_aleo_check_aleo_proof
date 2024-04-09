@@ -11,6 +11,7 @@ use snarkvm::{
 
 use jsonrpc_http_server::jsonrpc_core::{IoHandler, Params, Value};
 use jsonrpc_http_server::ServerBuilder;
+use serde_json::Value as JsonValue;
 
 pub fn start_rpc_server(port: u16, coinbase_puzzle: CoinbasePuzzle<CurrentNetwork>) {
     // let coinbasePuzzle_clone = coinbasePuzzle.clone();
@@ -27,17 +28,15 @@ pub fn start_rpc_server(port: u16, coinbase_puzzle: CoinbasePuzzle<CurrentNetwor
             Params::Map(p_map) => {
                 for (key, value) in &p_map {
                     match key.as_str() {
-                        "address" => {
-                            address = String::from_str(value.as_str().unwrap()).ok();
-                        }
-                        "nonce_ex" => {
-                            nonce_ex = value.as_u64();
-                        }
-                        "nonce_len" => {
-                            nonce_len = value.as_u64();
-                        }
-                        "mix_target" => {
-                            target = value.as_u64();
+                        "input_param" => {
+                            let input_param = String::from_str(value.as_str().unwrap()).ok();
+                            if let Some(input_param) = input_param {
+                                let parsed: Value = serde_json::from_str(&input_param).unwrap();
+                                nonce_ex = parsed.get("nonce_ex").and_then(JsonValue::as_u64);
+                                nonce_len = parsed.get("nonce_len").and_then(JsonValue::as_u64);
+                                target = parsed.get("min_proof_target").and_then(JsonValue::as_u64);
+                                address = parsed.get("address").and_then(JsonValue::as_str).map(|s| s.to_string());
+                            }
                         }
                         "proof" => {
                             proof = String::from_str(value.as_str().unwrap()).ok();
@@ -60,6 +59,7 @@ pub fn start_rpc_server(port: u16, coinbase_puzzle: CoinbasePuzzle<CurrentNetwor
                 let mix_target = target.unwrap();
         
                 if let Some((task_id, nonce, challenge,solution, proof, target)) = parse_parameters(&proof.unwrap()) {
+                    println!("\n***********************************************************************************************************************");
                     println!(
                         "Request check_aleo_proof: \n\tnonce_ex:{:#x} \n\taddress:{} \n\tmix_target:{} \n\ttask_id: {} \n\tnonce: {:#x} \n\tsolution: {} \n\tproof: {}, \n\ttarget: {}",
                         nonce_ex, address, mix_target, task_id, nonce,  solution, proof, target
@@ -82,10 +82,13 @@ pub fn start_rpc_server(port: u16, coinbase_puzzle: CoinbasePuzzle<CurrentNetwor
                     .unwrap();
         
                     if (nonce_ex & nonce) != nonce_ex {
+                        println!("Response check_aleo_proof:\t\tfalse  \n\tnonce_ex!= nonce");
+                        println!("***********************************************************************************************************************\n");
                         Ok(Value::Bool(false))
                     } else {
                         if mix_target > target {
-                            println!("Response check_aleo_proof:false  \n\ttarget < mix_target");
+                            println!("Response check_aleo_proof:\t\tfalse  \n\ttarget < mix_target");
+                            println!("***********************************************************************************************************************\n");
                             return Ok(Value::Bool(false))
                         }
                         if let Ok(verify) = prover_solution.verify(
@@ -93,20 +96,24 @@ pub fn start_rpc_server(port: u16, coinbase_puzzle: CoinbasePuzzle<CurrentNetwor
                             &challenge,
                             target,
                         ) {
-                            println!("Response check_aleo_proof:{verify}  \n\tVerify proof {}", verify);
+                            println!("Response check_aleo_proof:\t\t{verify}  \n\tVerify proof {}", verify);
+                            println!("***********************************************************************************************************************\n");
                             Ok(Value::Bool(verify))
                         } else {
-                            println!("Response check_aleo_proof:false  \n\tVerify proof solution failed");
+                            println!("Response check_aleo_proof:\t\tfalse  \n\tVerify proof solution failed");
+                            println!("***********************************************************************************************************************\n");
                             Ok(Value::Bool(false))
                         }
                     }
     
                 } else {
-                    println!("Response check_aleo_proof:false  \n\tVerify proof parse_parameters failed");
+                    println!("Response check_aleo_proof:\t\tfalse  \n\tVerify proof parse_parameters failed");
+                    println!("***********************************************************************************************************************\n");
                     Ok(Value::Bool(false))
                 }
             } else {
-                println!("Response check_aleo_proof:false  \n\tVerify proof missing parameters failed");
+                println!("Response check_aleo_proof:\t\tfalse  \n\tVerify proof missing parameters failed");
+                println!("\n***********************************************************************************************************************\n");
                 Ok(Value::Bool(false))
             }
         }
