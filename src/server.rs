@@ -120,7 +120,7 @@ pub fn start_rpc_server(port: u16, coinbase_puzzle: CoinbasePuzzle<CurrentNetwor
         
     });
 
-    let url = format!("127.0.0.1:{}", port);
+    let url = format!("0.0.0.0:{}", port);
     
     let server = ServerBuilder::new(io)
         .threads(3)
