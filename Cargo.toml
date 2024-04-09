@@ -12,3 +12,13 @@ features = [ "circuit", "console", "rocks" ]
 [dependencies]
 structopt = "0.3.26"
 hex = "0.4.3"
+jsonrpc-core = "18.0.0"
+jsonrpc-core-client = "18.0.0"
+jsonrpc-http-server = "18.0.0"
+jsonrpc-ipc-server = "18.0.0"
+jsonrpc-tcp-server= "18.0.0"
+jsonrpc-ws-server = "18.0.0"
+jsonrpc-stdio-server = "18.0.0"
+jsonrpc-derive = "18.0.0"
+jsonrpc-server-utils = "18.0.0"
+jsonrpc-pubsub = "18.0.0"
