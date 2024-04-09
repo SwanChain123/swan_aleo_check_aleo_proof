@@ -127,6 +127,8 @@ pub fn start_rpc_server(port: u16, coinbase_puzzle: CoinbasePuzzle<CurrentNetwor
         .start_http(&url.parse().unwrap())
         .unwrap();
 
+    println!("Server started on: {}", url);
+
     server.wait();
 }
 
